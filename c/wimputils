@@ -1,0 +1,198 @@
+/* Program: wimputils.c  V2.06 - By Tim Moore (17th Sept 1994)
+ *
+ * Purpose: General wimp utilities, to provide via header
+ *
+ */
+
+/******** RISC-OS LIBRARIES **********/
+
+#include "wimp.h"
+#include "wimpt.h"
+#include "win.h"
+#include "werr.h"
+#include "dbox.h"
+#include "template.h"
+
+/******** STANDARD LIBRARIES *********/
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/******** HEADER FILE FOR THIS ******/
+
+#include "wimputils.h"
+
+
+/***************************** WINDOW UTILS *****************************/
+
+BOOL Wimp_Utils_Create_Window(char *Name, wimp_w *Handle)
+{
+  wimp_wind *Window;    /* Pointer to window definition */
+
+  /* Find template for the window */
+    Window = template_syshandle(Name);
+    if (Window == 0)
+      return FALSE;
+
+  /* Create the window, dealing with errors */
+  return (wimpt_complain(wimp_create_wind(Window, Handle)) == 0);
+}
+
+
+void Wimp_Utils_Redraw_Window(wimp_w Handle)
+{
+  /* Redrawing the window here does nothing - just go through the loop */
+  int            More;
+  wimp_redrawstr r;
+
+  /* Start the redraw */
+  r.w = Handle;
+  wimpt_noerr(wimp_redraw_wind(&r, &More));
+
+  /* Do the redraw loop */
+  while (More)
+  {
+    wimp_get_rectangle(&r, &More);
+  }
+}
+
+
+
+BOOL Wimp_Utils_Open_Window(wimp_w Handle,BOOL Window_Limit,BOOL Window_Open)
+{
+  BOOL Success = FALSE;
+
+  /* Open the window - check limit for only one allowed */
+  if (Window_Open && Window_Limit)
+    werr(FALSE, "Only one window may be opened");
+  else
+  {
+    wimp_wstate  State;
+
+    /* Get the state of the window */
+    if (wimpt_complain(wimp_get_wind_state(Handle, &State)) == 0)
+    {
+      State.o.behind = -1;          /* Make sure window is opened in front */
+      wimpt_noerr(wimp_open_wind(&State.o));
+      Success = TRUE;
+    }
+  }
+  return (Success);
+}
+
+char *Wimp_Utils_Get_Icon_Text(wimp_w Window, wimp_i Icon, char *Text)
+{
+  wimp_icon Result;
+  wimp_get_icon_info(Window,Icon,&Result);
+  if ((Result.flags & wimp_INDIRECT) !=0)
+  {
+    strcpy(Text, Result.data.indirecttext.buffer);
+  }
+  else
+  {
+    werr(FALSE,"Icon not indirected!");
+    strcpy(Text, "");
+  }
+  return(Text);
+
+}
+
+
+void Wimp_Utils_Put_Icon_Text(wimp_w Window, wimp_i Icon, char *Text)
+{
+  wimp_icon Icon_Info;
+
+  wimp_get_icon_info(Window,Icon,&Icon_Info);
+  if ((Icon_Info.flags & wimp_INDIRECT) !=0)
+  {
+    strcpy(Icon_Info.data.indirecttext.buffer, Text);
+    wimp_set_icon_state(Window,Icon,0,0);
+  }
+  else
+  {
+    werr(FALSE,"Icon not indirected!");
+  }
+}
+
+
+/* wimp_utils_icon_empty
+ * Check if an icon is empty
+ * Parameters:
+ *    window : window handle
+ *    icon   : icon number
+ *
+ * ERROR IN THIS ? - NOT INCLUDED AT MOMENT!!!!
+BOOL wimp_utils_icon_empty(wimp_w window, wimp_i icon)
+{
+  char temp_string[256]="";
+
+  strcpy(temp_string,wimp_utils_get_icon_text(window, icon));
+
+  if (strlen(temp_string) > 0)
+    return (FALSE);
+  else
+    return (TRUE);
+} */
+
+
+void Wimp_Utils_Disable_Icon(wimp_w Window, wimp_i Icon)
+{
+  wimp_set_icon_state(Window,Icon,wimp_INOSELECT,wimp_INOSELECT);
+}
+
+
+
+void Wimp_Utils_Enable_Icon(wimp_w Window, wimp_i Icon)
+{
+  wimp_set_icon_state(Window,Icon,0,wimp_INOSELECT);
+}
+
+
+BOOL Wimp_Utils_Isselected(wimp_w Window, wimp_i Icon)
+{
+  wimp_icon Icon_Info;
+
+  wimp_get_icon_info(Window,Icon,&Icon_Info);
+  if ((Icon_Info.flags & wimp_ISELECTED) !=0)
+     return TRUE;
+  else
+     return FALSE;
+}
+
+
+void Wimp_Utils_Program_Info(char *Temp_Name, Version_Info The_Version_Info)
+{
+  dbox  d;  /* Dialogue box handle */
+
+  /* Create the dialogue box */
+  if (d = dbox_new(Temp_Name), d != NULL)
+  {
+    /* Fill in the version details, all others should be set in template
+     * file.
+     */
+    dbox_setfield(d, The_Version_Info.Version_Ic, The_Version_Info.Version);
+
+    /* Show the dialogue box */
+    dbox_show(d);
+
+    /* Keep it on the screen as long as needed */
+    dbox_fillin(d);
+
+    /* Dispose of the dialogue box */
+    dbox_dispose(&d);
+  }
+}
+
+void Wimp_Utils_Help(char *Text, wimp_msgstr *Msg)
+{
+    Msg->hdr.your_ref = Msg->hdr.my_ref;
+    Msg->hdr.action = wimp_MHELPREPLY;
+    Msg->hdr.size = 256;
+    sprintf(Msg->data.helpreply.text, Text);
+    wimpt_noerr(wimp_sendmessage(wimp_ESEND, Msg,
+                                    Msg->hdr.task));
+}
+
+
+/* end of wimputils.c */

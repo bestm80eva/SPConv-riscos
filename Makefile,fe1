@@ -1,0 +1,84 @@
+# Project:   Spconv
+
+
+# Toolflags:
+Drlinkflags = -aif -nounused -debimage -o $@ 
+ASflags = -throwback
+CCflags = -c -depend !Depend -IC: -throwback 
+Linkflags = -o $@
+ObjAsmflags = -depend !Depend -ThrowBack -Stamp -quit -CloseExec
+CMHGflags = 
+LibFileflags = -c -o $@
+Squeezeflags = -o $@
+AAsmflags = -depend !Depend -quit -CloseExec -To $@ -From
+
+
+# Final targets:
+@.!RunImage:   C:o.Stubs C:o.RISC_OSLib o.ROS-Spconv o.Spconv-FE o.wimputils \
+        o.genutils 
+        link $(linkflags) C:o.Stubs C:o.RISC_OSLib o.ROS-Spconv o.Spconv-FE \
+        o.wimputils o.genutils 
+@.o.genutils:   c.genutils 
+        cc $(ccflags) c.genutils 
+@.o.wimputils:   c.wimputils 
+        cc $(ccflags) c.wimputils 
+@.o.Spconv-FE:   c.Spconv-Fe 
+        cc $(ccflags) c.Spconv-Fe 
+@.Tspconv:   C:o.stubs C:o.RISC_OSLib o.Tspconv o.ROS-Spconv 
+        link $(linkflags) C:o.stubs C:o.RISC_OSLib o.Tspconv o.ROS-Spconv 
+@.o.Tspconv:   c.Tspconv 
+        cc $(ccflags) c.Tspconv 
+@.o.ROS-Spconv:   c.ROS-Spconv 
+        cc $(ccflags) c.ROS-Spconv 
+
+
+# User-editable dependencies:
+
+# Static dependencies:
+
+
+# Dynamic dependencies:
+o.Tspconv:	c.Tspconv
+o.Tspconv:	h.ROS-Spconv
+o.ROS-Spconv:	c.ROS-Spconv
+o.ROS-Spconv:	C:h.os
+o.ROS-Spconv:	C:h.werr
+o.ROS-Spconv:	h.ROS-Spconv
+o.Spconv-Fe:	c.Spconv-Fe
+o.Spconv-Fe:	C:h.wimp
+o.Spconv-Fe:	C:h.os
+o.Spconv-Fe:	C:h.sprite
+o.Spconv-Fe:	C:h.wimpt
+o.Spconv-Fe:	C:h.win
+o.Spconv-Fe:	C:h.werr
+o.Spconv-Fe:	C:h.dbox
+o.Spconv-Fe:	C:h.template
+o.Spconv-Fe:	C:h.event
+o.Spconv-Fe:	C:h.menu
+o.Spconv-Fe:	C:h.baricon
+o.Spconv-Fe:	C:h.res
+o.Spconv-Fe:	C:h.resspr
+o.Spconv-Fe:	C:h.menu
+o.Spconv-Fe:	C:h.msgs
+o.Spconv-Fe:	C:h.xferrecv
+o.Spconv-Fe:	C:h.saveas
+o.Spconv-Fe:	C:h.xfersend
+o.Spconv-Fe:	C:h.os
+o.Spconv-Fe:	C:h.swis
+o.Spconv-Fe:	h.wimputils
+o.Spconv-Fe:	h.genutils
+o.Spconv-Fe:	h.ROS-SPConv
+o.Spconv-Fe:	h.SPConv-FE
+o.wimputils:	c.wimputils
+o.wimputils:	C:h.wimp
+o.wimputils:	C:h.os
+o.wimputils:	C:h.sprite
+o.wimputils:	C:h.wimpt
+o.wimputils:	C:h.win
+o.wimputils:	C:h.werr
+o.wimputils:	C:h.dbox
+o.wimputils:	C:h.template
+o.wimputils:	h.wimputils
+o.genutils:	c.genutils
+o.genutils:	C:h.os
+o.genutils:	C:h.swis

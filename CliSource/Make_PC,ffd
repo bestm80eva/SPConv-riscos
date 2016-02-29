@@ -1,0 +1,52 @@
+#
+# Makefile for SPCONV - SPECTRUM SNAPSHOT CONVERTER 1.08
+#
+# H. de Groot
+#
+
+LIB=c:\tc\lib\cs
+START=c:\tc\lib\c0s
+
+.SILENT
+
+.c.obj:
+  tcc -ms -c -d -G -O $<
+
+all:	spconv.exe spconv.doc
+
+spconv.exe: spconv.obj
+  tlink $(START) spconv.obj,spconv.exe,NUL,$(LIB)
+
+spconv.obj:	spconv.c	spconv.h
+
+clean:
+	del *.obj
+	del *.exe
+	del *.sig
+
+sign: spconv.sig
+	echo Executable signed with spconv.sig
+
+spconv.sig: spconv.exe
+	del spconv.sig
+	c:\pgp\pgp -sb spconv.exe -u "Henk de Groot"
+
+spconv.doc: spconv.1
+	del spconv.doc
+	nroff -fn -man spconv.1 > spconv.doc
+
+arj:	spconv.arj
+	echo Spconv.arj up to date
+
+zip:	spconv.zip
+	echo Spconv.zip up to date
+
+spconv.arj: spconv.exe spconv.c spconv.h spconv.sig spconv.doc spconv.1 \
+		makefile makefile.unx history.doc author.doc
+	arj a spconv.arj spconv.exe spconv.c spconv.h spconv.sig spconv.doc \
+		spconv.1 makefile makefile.unx history.doc author.doc
+
+spconv.zip: spconv.exe spconv.c spconv.h spconv.sig spconv.doc spconv.1 \
+		makefile makefile.unx history.doc author.doc
+	pkzip spconv.zip spconv.exe spconv.c spconv.h spconv.sig spconv.doc \
+		spconv.1 makefile makefile.unx history.doc author.doc

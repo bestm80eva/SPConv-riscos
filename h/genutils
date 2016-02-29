@@ -1,0 +1,13 @@
+/* Program: Genutils.h
+ *
+ * Purpose: Provide some general utilties
+ *
+ */
+
+#ifndef Genutils_h
+#define Genutils_h
+
+extern BOOL Genutils_Copy_File (char *From, char *To);
+extern BOOL Genutils_Set_File_Type (char *ForFile, int ToType);
+
+#endif

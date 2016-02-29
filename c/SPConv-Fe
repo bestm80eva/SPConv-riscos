@@ -1,0 +1,467 @@
+/* Program: SPConv-FE.c   (Spectrum snapshot converter, front-end)
+ *
+ * Purpose: Convert Spectrum snapshot files.
+ *
+ * Details: This is a wimp version for RISC-OS.
+ *          This program is a front end to 'ROS-SPConv.c' (a modified version
+ *          of 'spconv.c'.
+ *          It deals with drag-and-dropping/loading-and-saving of files
+ *          before and after calling 'spconv' in 'ROS-SPConv.c'.
+ *          The routing 'spconv' in 'ROS-SPConv.c' does the conversion
+ *          and this program deals with specifying the input filename
+ *          and input/output file types.
+ *
+ * Author:  RISC-OS conversion: Tim Moore (c) 1994
+ *          Original version: Henk de Groot (c)
+ *
+ */
+
+/****** RISC-OS INCLUDE LIBRARIES *******/
+
+#include "wimp.h"
+#include "wimpt.h"
+#include "win.h"
+#include "werr.h"
+#include "dbox.h"
+#include "template.h"
+#include "event.h"
+#include "baricon.h"
+#include "res.h"
+#include "resspr.h"
+#include "menu.h"
+#include "msgs.h"
+#include "xferrecv.h"
+#include "saveas.h"
+#include "os.h"
+#include "swis.h"
+
+/****** STANDARD ANSI LIBRARIES *********/
+
+#include <string.h>
+#include <stdlib.h>
+
+/****** APPLICATION LIBRARIES ***********/
+
+#include "wimputils.h"   /* Some wimp routines */
+#include "genutils.h"    /* General utils */
+#include "ROS-SPConv.h"  /* The 'SPConv' code */
+#include "SPConv-FE.h"   /* Pre-declarations for this source */
+
+
+/******************* APPLICATION TYPE DECLARATIONS ************************/
+
+/************************** APPLICATION GLOBAL DATA *************************/
+
+static int In_FileFormat=NULL;  /* Current settings of the file format */
+static int Out_FileFormat=NULL;
+
+static char Input_Filename[255];
+const char Output_Filename[]="<Wimp$ScrapDir>.NewSnap";
+
+/*************************** WIMP GLOBAL DATA *******************************/
+
+/* The top of the bar menu tree */
+static menu Bar_Menu;
+
+/* Handle for the main window */
+static wimp_w Main_Window_Handle;
+
+/* Flag - is the main window open */
+static BOOL Main_Window_Open = FALSE;
+
+
+/******************************* MAIN PROGRAM ********************************/
+
+/*--- Main entry point. ---*/
+int main()
+{
+  if (Program_Initialise())
+  {
+    /* The main event loop */
+    while (TRUE)
+      event_process();
+  }
+
+  return 0;
+}
+
+/************************** USER FUNCTIONS/EVENT HANDLERS *********************/
+
+/*--- Import file and open main window if neccessary --- */
+static void User_Import_File(void)
+{
+  int filetype;
+  char *temp;
+
+  filetype=xferrecv_checkinsert(&temp);
+
+  strcpy(Input_Filename,temp);
+
+  switch (filetype)
+  {
+    case SNAOLD_FTYPE:   /* Accept old filetype as well as new */
+    case SNA_FTYPE: In_FileFormat=SNA;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case SP_FTYPE : In_FileFormat=SP;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case Z80OLD_FTYPE:
+    case Z80_FTYPE: In_FileFormat=Z80;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case PRG_FTYPE: In_FileFormat=PRG;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case RAW_FTYPE: In_FileFormat=RAW;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case ACH_FTYPE: In_FileFormat=ACH;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case KGB_FTYPE: In_FileFormat=KGB;
+                    User_Open_Window(Main_Window_Handle);
+                    break;
+    case UNKNOWN_FTYPE: In_FileFormat=UNKNOWN;
+                        User_Open_Window(Main_Window_Handle);
+                        break;
+
+    default: In_FileFormat=NULL;
+             break;
+  }
+  xferrecv_insertfileok();
+}
+
+static BOOL User_Save_File (char *filename, void *handle)
+{
+  int FileType=User_File_Format_To_FType(Out_FileFormat);
+
+  handle=handle;
+
+  /* Copy file from Wimp$ScrapDir (deleting the original) to destination
+     in 'filename' */
+
+  if (!Genutils_Copy_File((char *) Output_Filename,filename)) {
+     werr(FALSE,"Problems copying file to destination");
+     return FALSE;
+  }
+
+  if (Wimp_Utils_Isselected(Main_Window_Handle, NEW_FTYPE_OPTION)) {
+     if (FileType == SNA_FTYPE) FileType=SNAOLD_FTYPE;
+     if (FileType == Z80_FTYPE) FileType=Z80OLD_FTYPE;
+  }
+  /* Now set filetype */
+  if (!Genutils_Set_File_Type(filename,FileType)) {
+     werr(FALSE,"Problem setting the destination file type");
+     return FALSE;
+  }
+  else
+     return TRUE;
+}
+
+static int User_File_Format_To_FType(int FileFormat)
+{
+  switch (FileFormat) {
+     case SP: return SP_FTYPE; break;
+     case SNA: return SNA_FTYPE; break;
+     case Z80: return Z80_FTYPE; break;
+     case PRG: return PRG_FTYPE; break;
+     case RAW: return RAW_FTYPE; break;
+     case ACH: return ACH_FTYPE; break;
+     case KGB: return KGB_FTYPE; break;
+     default: break;
+  }
+  return UNKNOWN_FTYPE;
+}
+
+static void User_Save_As()
+{
+
+  int File_Type=User_File_Format_To_FType(Out_FileFormat);
+
+  if (!saveas(File_Type, "Snapshot", 67584, User_Save_File, 0, 0, 0))
+     werr(FALSE,"Error with SaveAs dialogue");
+}
+
+/*--- Determine selected option in main window ---*/
+static int User_Get_Save_Option(void)
+{
+
+  if (Wimp_Utils_Isselected(Main_Window_Handle, SP_OPTION)) return SP;
+  if (Wimp_Utils_Isselected(Main_Window_Handle, SNA_OPTION)) return SNA;
+  if (Wimp_Utils_Isselected(Main_Window_Handle, Z80_OPTION)) return Z80;
+  if (Wimp_Utils_Isselected(Main_Window_Handle, PRG_OPTION)) return PRG;
+  if (Wimp_Utils_Isselected(Main_Window_Handle, ACH_OPTION)) return ACH;
+  if (Wimp_Utils_Isselected(Main_Window_Handle, KGB_OPTION)) return KGB;
+
+  /* Default, this should never be reached */
+  return ACH;
+}
+
+/*--- Actions to perform on opening a window ---*/
+static void User_Open_Window(wimp_w Handle)
+{
+  if (Handle == Main_Window_Handle)
+  {
+     Main_Window_Open=Wimp_Utils_Open_Window( Main_Window_Handle,TRUE,
+                                                    Main_Window_Open );
+  }
+}
+
+/*--- Actions to perform on closing a window ---*/
+static void User_Close_Window(wimp_w Handle)
+{
+  if (Handle == Main_Window_Handle)
+  {
+     wimpt_noerr(wimp_close_wind(Handle));
+     Main_Window_Open=FALSE;
+  }
+}
+
+/*--- User clicked a mouse button somewhere, now we deal with it ---*/
+static void User_Button_Press(wimp_i Icon, wimp_w Handle)
+{
+  int result;
+
+  if (Handle == Main_Window_Handle)
+  {
+    switch (Icon)
+    {
+
+      case PROCEED_ICON: Out_FileFormat=User_Get_Save_Option();
+                         result=spconv(Input_Filename, In_FileFormat, Out_FileFormat);
+                         if (result == EXIT_OK) User_Save_As();
+                         remove(Output_Filename);
+                         User_Close_Window(Main_Window_Handle);
+                         In_FileFormat=NULL;
+                         break;
+
+      case CANCEL_ICON: User_Close_Window(Main_Window_Handle);
+                        In_FileFormat=NULL;
+                        break;
+      default:
+         break;
+    }
+  }
+}
+
+/*--- Event handler called on a left click on the icon-bar icon. ---*/
+static void User_Bar_Iconclick(wimp_i Icon)
+{
+  Icon = Icon; /* We don't need the handle: this stops compiler warning */
+}
+
+/*--- A request for help is dealt with here ---*/
+static void User_Process_Help(wimp_msgstr *Msg)
+{
+    char Help_Lookup[10];
+
+    /* Locate the window pointer is currently over */
+    if (Msg->data.helprequest.m.w == Main_Window_Handle)
+    {
+        if (Msg->data.helprequest.m.i == -1)
+            strcpy(Help_Lookup,"HMWIND");
+        else
+            sprintf(Help_Lookup,"HMWINDI%d",Msg->data.helprequest.m.i);
+
+        Wimp_Utils_Help(msgs_lookup(Help_Lookup),Msg);
+    }
+    else
+        /* Pointer must be over the icon bar */
+        Wimp_Utils_Help(msgs_lookup("IBARHELP"),Msg);
+}
+
+/*--- A keyboard event is dealt with here ---*/
+static void User_Keyboard_Hit(wimp_caretstr c, int Chcode)
+{
+    c=c; /* Un-needed handle */
+
+    switch (Chcode)
+    {
+
+        /**** Need one for RETURN as with clicking on OK ****/
+
+        default:
+            wimp_processkey(Chcode);  /* Pass unknown key events back to wimp */
+            break;
+    }
+}
+
+/*--- Create a dialogue box for program information details ---*/
+static void User_Prog_Info(void)
+{
+    Version_Info The_Version_Info;
+
+    strcpy(The_Version_Info.Version,msgs_lookup("Version"));
+    The_Version_Info.Version_Ic=INFO_VERSION_ICON;
+    Wimp_Utils_Program_Info("ProgInfo",The_Version_Info);
+}
+
+/****************************** MENU HANDLING **************************/
+
+/*--- Event handler for the bar menu. ---*/
+static void User_Bar_Menuproc(void *Handle, char *Hit)
+{
+  char Help_Command[80];
+
+  Handle = Handle; /* We don't need handle: this stops compiler warning */
+
+  /* Find which menu item was hit and take action as appropriate */
+  switch (Hit[0])
+  {
+    case BAR_MENU_INFO:
+      User_Prog_Info();
+      break;
+
+    case BAR_MENU_HELP:
+      sprintf(Help_Command,"%s",msgs_lookup("HCommand"));
+      os_cli(Help_Command);
+      break;
+
+    case BAR_MENU_QUIT:
+      /* Exit from the program. The wimp gets rid of the window and icon */
+      exit(0);
+  }
+}
+
+/*--- Event handler for the main menu. ---*/
+static void User_Main_Menuproc(void *Handle, char *Hit)
+{
+  char Help_Command[80];
+  Handle=Handle;
+
+
+  /* Find which menu item was hit and take action as appropriate */
+  switch (Hit[0])
+  {
+    case MAIN_MENU_INFO:
+      User_Prog_Info();
+      break;
+
+    case MAIN_MENU_HELP:
+      sprintf(Help_Command,"%s",msgs_lookup("HCommand"));
+      os_cli(Help_Command);
+      break;
+
+  }
+}
+
+
+/*--- Menu Maker (Create a menu for the main window only when needed ---*/
+static menu User_Main_Window_Menumaker(void *Handle)
+{
+  menu Main_Menu;
+
+  Handle = Handle;
+  if (!event_is_menu_being_recreated())
+  {
+    /* Create the main window menu tree */
+       Main_Menu = menu_new(msgs_lookup("Men1Title"), msgs_lookup("Menu1"));
+
+  }
+
+  return Main_Menu;
+
+}
+
+/****************************** EVENT HANDLERS ******************************/
+
+/*---  Window event handler, used for all windows ---*/
+static void Window_Event_Handler(wimp_eventstr *e, void *Handle)
+{
+
+  Handle = Handle; /* We don't need handle: this stops compiler warning */
+
+  /* Deal with event */
+  switch (e->e)
+  {
+    case wimp_EREDRAW:
+      Wimp_Utils_Redraw_Window(e->data.o.w);
+      break;
+
+    case wimp_EOPEN:
+      wimpt_noerr(wimp_open_wind(&e->data.o));
+      break;
+
+    /* Do this under the 'cancel' button, there's no 'close' icon */
+    case wimp_ECLOSE:  /* Pass on close request */
+      User_Close_Window(e->data.o.w); /* window to close */
+      break;
+
+    case wimp_EBUT:  /* Check for button presses */
+      if ((e->data.but.m.bbits & wimp_BLEFT)||(e->data.but.m.bbits &
+                    wimp_BRIGHT))
+         User_Button_Press(e->data.but.m.i, e->data.but.m.w); /* Icon and
+                                                                 window */
+      break;
+
+    case wimp_ESEND:
+    case wimp_ESENDWANTACK: /* Process broadcasts */
+        switch (e->data.msg.hdr.action)
+        {
+            case wimp_MDATALOAD:
+                User_Import_File(); /* Check imported file type and open
+                                       conversion window if neccessary */
+                break;
+
+            case wimp_MHELPREQUEST:
+                User_Process_Help(&e->data.msg);
+                break;
+
+            default:
+                break;
+        }
+        break;
+
+    case wimp_EKEY: /* Process keyboard events */
+        User_Keyboard_Hit(e->data.key.c, e->data.key.chcode);
+        break;
+
+    default:   /* Ignore any other event */
+      break;
+  }
+}
+
+/****************************** INITIALISATION ******************************/
+
+/*--- Initialise the program, returning TRUE if it was all OK. ---*/
+static BOOL Program_Initialise(void)
+{
+  /* RISC_OSlib initialisation */
+  wimpt_init("SPConv");         /* Main Wimp initialisation */
+  res_init("SPConv");           /* Resources */
+
+  /* resspr_init();*/                   /* Application Sprites */
+
+  template_init();                 /* Templates */
+  dbox_init();                     /* Dialogue boxes */
+  msgs_init();                     /* Initialise message routines */
+
+  /* Create the main window, and declare its event handler */
+  if (!Wimp_Utils_Create_Window("Main", &Main_Window_Handle))
+    return FALSE; /* Window creation failed */
+  win_register_event_handler(Main_Window_Handle, Window_Event_Handler, 0);
+
+
+  /* Create the menu bar tree */
+  if (Bar_Menu = menu_new(msgs_lookup("MMenTitle"), msgs_lookup("MMenu")),
+    Bar_Menu == NULL)
+    return FALSE; /* Menu create failed */
+
+  /* attach a menumaker to the main window */
+  if (!event_attachmenumaker(Main_Window_Handle,User_Main_Window_Menumaker,
+    User_Main_Menuproc, 0))
+    return FALSE; /* Unable to attach menumaker */
+
+  /* Set up the icon on the icon bar, and declare its event handlers */
+  baricon("!spconv", (int)resspr_area(), User_Bar_Iconclick);
+  if (!event_attachmenu(win_ICONBAR, Bar_Menu, User_Bar_Menuproc, 0))
+    return FALSE; /* Unable to attach menu */
+
+  /* Attach other events to window event handler */
+  win_claim_unknown_events(Main_Window_Handle);
+
+
+  /* All went ok */
+  return TRUE;
+}

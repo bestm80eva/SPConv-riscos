@@ -1,0 +1,12 @@
+/* Test Program: Tspconv.c
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "ROS-Spconv.h"
+
+int main ()
+{
+    return (spconv ("sna_test", SNA, ACH));
+}

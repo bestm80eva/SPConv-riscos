@@ -1,0 +1,82 @@
+/* Program: Spconv-FE.h   (Spectrum snapshot converter, front-end)
+ *
+ * Purpose: Convert Spectrum snapshot files.
+ *
+ * Details: This is a wimp version for RISC-OS.
+ *          This program is a front end to 'ROS-Spconv.c' (a modified version
+ *          of 'spconv.c'.
+ *          It deals with drag-and-dropping/loading-and-saving of files
+ *          before and after calling 'spconv' in 'ROS-Spconv.c'.
+ *          The routing 'spconv' in 'ROS-Spconv.c' does the conversion
+ *          and this program deals with specifying the input filename
+ *          and input/output file types.
+ *
+ * Author:  RISC-OS conversion: Tim Moore (c) 1994
+ *          Original version: Henk de Groot (c)
+ *
+ */
+
+/********************************* CONSTANTS ********************************/
+
+#ifndef Spconv_FE_H
+#define Spconv_FE_H
+
+/* Bar Menu items */
+#define BAR_MENU_INFO     1
+#define BAR_MENU_HELP     2
+#define BAR_MENU_QUIT     3
+
+/* Main Menu items */
+#define MAIN_MENU_INFO    1
+#define MAIN_MENU_HELP    2
+
+/* Info box fields */
+#define INFO_VERSION_ICON    7
+
+/* Main window icons */
+#define PROCEED_ICON      10
+#define CANCEL_ICON       8
+#define SP_OPTION         1
+#define Z80_OPTION        2
+#define SNA_OPTION        3
+#define PRG_OPTION        4
+#define ACH_OPTION        5
+#define KGB_OPTION        6
+#define NEW_FTYPE_OPTION  9
+
+/* Others */
+
+#define SNAOLD_FTYPE   0xCEF
+#define Z80OLD_FTYPE   0xCEE
+#define SNA_FTYPE      0xBA1
+#define Z80_FTYPE      0xBA0
+#define RAW_FTYPE      0x701
+#define ACH_FTYPE      0x702
+#define SP_FTYPE       0x225
+#define PRG_FTYPE      0x226
+#define KGB_FTYPE      0x227
+#define UNKNOWN_FTYPE  0xFFD
+
+/*************************** FUNCTION DECLARATIONS ***************************/
+
+/*** WIMP FUNCTIONS ***/
+static void User_Prog_Info(void);
+static void User_Import_File(void);
+static BOOL User_Save_File(char *filename, void *handle);
+static int  User_File_Format_To_FType(int FileFormat);
+static void User_Save_As(void);
+static int  User_Get_Save_Option(void);
+static void User_Open_Window(wimp_w Handle);
+static void User_Close_Window(wimp_w Handle);
+static void User_Button_Press(wimp_i Icon, wimp_w Handle);
+static void User_Keyboard_Hit(wimp_caretstr c, int Chcode);
+static void User_Bar_Iconclick(wimp_i Icon);
+static void User_Bar_Menuproc(void *Handle, char *Hit);
+static void User_Process_Help(wimp_msgstr *Msg);
+static void User_Main_Menuproc(void *Handle, char *Hit);
+static menu User_Main_Window_Menumaker(void *Handle);
+static void Window_Event_Handler(wimp_eventstr *e, void *Handle);
+static BOOL Program_Initialise(void);
+
+
+#endif

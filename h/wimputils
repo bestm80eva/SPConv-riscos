@@ -1,0 +1,178 @@
+/* Header: wimputils.h  V2.06 - By Tim Moore (17th Sept 1994)
+ *
+ * Purpose: General wimp utilities
+ *
+ * Other Info: Most of these functions provide a simpler call strcuture
+ *             to RISC_OSLib by removing common code from the main programs
+ *             and making the calls easier to understand.
+ *
+ */
+
+#ifndef __wimputils_h
+#define __wimputils_h
+
+#ifndef BOOL
+#define BOOL int
+#define TRUE 1
+#define FALSE 0
+#endif
+
+/**************************** DATA / STRUCTURES ***************************/
+
+typedef struct {
+   int  Version_Ic;
+   char Version[80];
+} Version_Info;
+
+/******************************* THE FUNCTIONS ****************************/
+
+/* ----------------------- wimp_utils_create_window ------------------------
+ * Description:   Create the window, yielding its handle.
+ *
+ * Parameters:    char *Name -- the name of the window template
+ *                wimp_w Handle -- the window's handler
+ * Returns:       TRUE if all ok.
+ * Other Info:    none.
+ *
+ */
+BOOL Wimp_Utils_Create_Window( char *Name /*in*/ , wimp_w *Handle /*out*/);
+
+
+
+/* ----------------------- wimp_utils_redraw_window ------------------------
+ * Description:   Event handling to deal with redrawing the window
+ *
+ * Parameters:    wimp_w Handle -- the window's handler
+ * Returns:       void.
+ * Other Info:    (future change to call a user routine?)
+ *
+ */
+void Wimp_Utils_Redraw_Window( wimp_w Handle /*in*/);
+
+
+
+/* ----------------------- wimp_utils_open_window --------------------------
+ * Description:   Open a window (simpler call)
+ *
+ * Parameters:    wimp_w Handle -- the window's handler
+ *                BOOL Window_Limit -- if TRUE limits the number of this
+ *                                     window allowed to be opened to 1
+ *                BOOL Window_Open -- used to pass/change details of window
+ *                                    being open or not
+ * Returns:       TRUE if all ok.
+ * Other Info:    This is just to abstract the call and make it simpler.
+ *                It will always open window in front.  A seperate function
+ *                will be necessary to deal with more complex features.
+ *
+ */
+BOOL Wimp_Utils_Open_Window( wimp_w Handle /*in*/ ,BOOL Window_Limit /*in*/
+                                ,BOOL Window_Open /*in*/);
+
+
+
+/* ----------------------- wimp_utils_get_icon_text ------------------------
+ * Description:   Get text from a indirected icon
+ *
+ * Parameters:    wimp_w Window -- the window's handler
+ *                wimp_i Icon -- the icon number
+ *                char *Text -- the returned text
+ * Returns:       the returned text
+ * Other Info:    none.
+ *
+ */
+char *Wimp_Utils_Get_Icon_Text( wimp_w Window /*in*/, wimp_i Icon /*in*/,
+                                     char *Text /*out*/);
+
+
+
+/* ----------------------- wimp_utils_put_icon_text ------------------------
+ * Description:   Put text into an indirected icon
+ *
+ * Parameters:    wimp_w Window -- the window's handler
+ *                wimp_i Icon -- the icon number
+ *                char *Text -- the text to insert
+ * Returns:       void.
+ * Other Info:    none.
+ *
+ */
+void Wimp_Utils_Put_Icon_Text( wimp_w Window /*in*/, wimp_i Icon /*in*/,
+                                 char *Text /*in*/);
+
+
+
+/* ERROR IN NEXT ONE - REMOVED FOR MOMENT!!!
+ * BOOL wimp_utils_icon_empty( wimp_w window, wimp_i icon);
+ */
+
+
+
+/* ----------------------- wimp_utils_disable_icon -------------------------
+ * Description:   Disable an icon by 'greying' it out
+ *
+ * Parameters:    wimp_w Window -- the window's handler
+ *                wimp_i Icon -- the icon number
+ * Returns:       void.
+ * Other Info:    none.
+ *
+ */
+void Wimp_Utils_Disable_Icon( wimp_w Window /*in*/, wimp_i Icon /*in*/);
+
+
+
+/* ----------------------- wimp_utils_enable_icon --------------------------
+ * Description:   Enable an icon by 'ungreying' it
+ *
+ * Parameters:    wimp_w Window -- the window's handler
+ *                wimp_i Icon -- the icon number
+ * Returns:       void.
+ * Other Info:    none.
+ *
+ */
+void Wimp_Utils_Enable_Icon( wimp_w Window /*in*/, wimp_i Icon /*in*/);
+
+
+
+/* ----------------------- wimp_utils_isselected ---------------------------
+ * Description:   Detects if an icon is 'selected' by user
+ *
+ * Parameters:    wimp_w Window -- the window's handler
+ *                wimp_i Icon -- the icon number
+ * Returns:       TRUE or FALSE.
+ * Other Info:    none.
+ *
+ */
+BOOL Wimp_Utils_Isselected(wimp_w Window /*in*/, wimp_i Icon /*in*/);
+
+
+
+/* --------------------- wimp_utils_program_info ---------------------------
+ * Description:   Display the program info box - called from the menu processor. *
+ * Parameters:    char *Temp_Name -- name of dialogue box template
+ *                Version_Info The_Version_Info
+                                  -- The version field to fill in.
+ * Returns:       void.
+ * Other Info:    This function has just been moved away from main routines
+ *                to remove commonly repeated areas and things you don't need
+ *                to think about.  It used the object 'info_details_type'.
+ *
+ */
+void Wimp_Utils_Program_Info( char *Temp_Name /*in*/,
+                              Version_Info The_Version_Info /*in*/ );
+
+
+
+/* ---------------------------- wimp_utils_help ----------------------------
+ * Description:   Sends messages after requests made for interactive help,
+ *                given the message string from the event and the text to
+ *                display. *
+ * Parameters:    char *Text -- help text to send
+ *                wimp_msgstr *Msg -- event details of the message string.
+ * Returns:       void.
+ * Other Info:    none.
+ *
+ */
+void Wimp_Utils_Help(char *Text /*in*/, wimp_msgstr *Msg /*inout*/);
+
+#endif
+
+/* end of wimputils.h */

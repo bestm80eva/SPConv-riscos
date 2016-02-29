@@ -1,0 +1,35 @@
+# !SPConv message file
+
+# Info details
+Version:1.10 (14th June 1995)
+
+# Menus
+MMenTitle:SPConv
+MMenu:>Info,Help,Quit
+Men1Title:SPConv
+Menu1:>Info,Help
+
+# Help
+HCommand:Filer_Run <SPConv$Dir>.!Help
+IBARHELP:This is the !SPConv application.|MIt converts spectrum snapshot 'images' between different formats.|MDrag a 'snapshot' file here to open conversion window.|MClick MENU to get further help and information, and to quit.|M
+
+# Main window help
+HMWIND:This window allows you to choose which type of snapshot you want to convert to.|MSee the documentation and help files inside this application for further information.|M
+HMWINDI0:This window allows you to choose which type of snapshot you want to convert to.|MSee the documentation and help files inside this application for further information.|M
+HMWINDI1:Click SELECT here to choose the SP format of snapshot for output.
+HMWINDI2:Click SELECT here to choose the Z80 format of snapshot for output.
+HMWINDI3:Click SELECT here to choose the SNA format of snapshot for output.
+HMWINDI4:Click SELECT here to choose the PRG format of snapshot for output.
+HMWINDI5:Click SELECT here to choose the ACH format of snapshot for output.
+HMWINDI6:Click SELECT here to choose the KGB format of snapshot for output.
+HMWINDI7:This window allows you to choose which type of snapshot you want to convert to.|MSee the documentation and help files inside this application for further information.|M
+HMWINDI8:Click SELECT here to abort the conversion.
+HMWINDI9:Click SELECT here to toggle between old and new SNA/Z80 filetypes to save to.
+HMWINDI10:Click SELECT here to convert input file to selected output file.
+
+# Menu help (not implemented at the moment)
+IHELP0:Move the pointer right to see information about SPConv.
+IHELP1:Click SELECT for further help.
+IHELP2:Click SELECT to quit SPConv.
+HELP0:Move the pointer right to see information about SPConv.
+HELP1:Click SELECT for further help.

@@ -1,0 +1,52 @@
+/* Program: Genutils.c
+ *
+ * Purpose: Provide some general utilties
+ *
+ */
+
+#include <stdlib.h>
+#include "os.h"
+#include "swis.h"
+
+#define COPY_RECURSE                0x1u
+#define COPY_FORCE                  0x2u
+#define COPY_GIVEN_TIMES            0x4u
+#define COPY_CONFIRM                0x8u
+#define COPY_VERBOSE                0x10u
+#define COPY_QUICK                  0x20u
+#define COPY_PROMPT                 0x40u
+#define COPY_DELETE                 0x80u
+#define COPY_ALLOW_PRINT            0x100u
+#define COPY_NO_ATTRIBUTES          0x200u
+#define COPY_STAMP                  0x400u
+#define COPY_STRUCTURE              0x800u
+#define COPY_NEWER                  0x1000u
+#define COPY_GIVEN_DESCRIPTOR       0x2000u
+#define COPY_LOOK                   0x4000u
+
+/*--- Simple file copy mapping to SWI call with no deletion of file --- */
+extern BOOL Genutils_Copy_File (char *From, char *To)
+{
+   os_regset CopySet={{0,0,0,0,0,0,0,0,0,0}};
+   int flags=COPY_FORCE;
+
+
+   CopySet.r[0]=0x1A;
+   CopySet.r[1]=(int) From;
+   CopySet.r[2]=(int) To;
+   CopySet.r[3]=flags;
+
+   if (os_swix(OS_FSControl,&CopySet) != NULL)
+      return FALSE;
+   else
+      return TRUE;
+
+}
+
+extern BOOL Genutils_Set_File_Type (char *ForFile, int ToType)
+{
+  if (os_swi3(OS_File,0x12,(int) ForFile, ToType) != NULL)
+     return FALSE;
+  else
+     return TRUE;
+}
