@@ -1,0 +1,24 @@
+| !Run file for !SPConv
+|
+If "<Wimp$ScrapDir>" = "" Then Error Open a directory viewer with !Scrap in before running !SPConv
+
+RMEnsure SharedCLibrary 3.50 RMLoad System:Modules.Clib
+RMEnsure SharedCLibrary 3.50 Error You need Clib 3.50 or later
+|
+Set File$Type_CEF SNAold
+Set File$Type_CEE Z80old
+Set File$Type_BA0 Z80
+Set File$Type_BA1 SNA
+Set File$Type_225 SP
+Set File$Type_226 PRG
+Set File$Type_227 ZX
+Set File$Type_701 RAWsnap
+Set File$Type_702 SpecProg
+
+Set SPConv$Dir <Obey$Dir>
+Set SPConvRom$Dir <Obey$Dir>.Resources
+IconSprites <Obey$Dir>.!Sprites
+
+WimpSlot -min 160K -max 160K
+Run <Obey$Dir>.!RunImage %*0
+Unset SPConv$Dir

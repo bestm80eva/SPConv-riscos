@@ -1,0 +1,20 @@
+1) Solid icon drags.
+
+2) Add command-line functionality to !Spconv so that the usage
+is something like ...
+
+!Spconv <infile> [<outfile>] <outtype>
+
+Where <outtype> is a FileType within the allowed range for
+!Spconv.
+
+<outfile> is optional as just specifying <outtype> will convert
+the input file to the <outtype> of the same name.
+(This will replace the file in the directory though).
+Or perhaps add a small extension on the filename (ie. _1 ?).
+Maybe this is too dangerous for RiscOS users, therefore just
+have...
+
+!Spconv <infile> <outfile> <outtype>
+
+Where <outfile> MUST be different from <infile>

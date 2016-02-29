@@ -1,0 +1,325 @@
+
+
+SPCONV(1)                  Unix Programmer's Manual                  SPCONV(1)
+
+
+NAME
+
+     spconv - Convert snapshot files (.SNA, .SP, .Z80,  .PRG,  .ACH,  .ZX  and
+     RAW)
+
+
+DISCLAIMER
+
+     This programs are Public Domain, and because of that I will not be liable
+     for any damages resulting from use of this software.
+
+
+SYNOPSIS
+
+     spconv <infile.EXT> <.EXT>
+     spconv <infile.EXT> <outfile.EXT>
+
+
+DESCRIPTION
+
+     Spconv is a utility to convert between various snapshot formats. Snapshot
+     files  are created by various spectrum emulators. SPCONV converts between
+     .SNA, .SP, .Z80, .PRG, .ACH and .ZX files.
+
+     Wildcards for the infile or outfile parameters are not accepted, an error
+     message  is  displayed  if  either  *  or  ?  is found in one or both the
+     filenames. The outfile parameter is either a full filename  or  only  the
+     suffix  .SNA,  .SP, .Z80, .PRG, .ACH or .ZX. The prefix is taken from the
+     first parameter in that case.
+
+     Normaly the <infile> and <outfile> are not of the same type. If they  are
+     you will get a error message. This is so unless both files are of the .SP
+     or .Z80 type. In case of .SP format the converter  will  convert  an  old
+     style .SP file to a new style .SP file or from a new style .SP file to an
+     old style .SP file, depending on the input. The old  style  .SP  file  is
+     used  by VGASPEC, with seems to be an unauthorised version of the spanish
+     "SPECTRUM" program. The "SPECTRUM" program will use  the  new  style  .SP
+     files.
+
+     In case both files are of the .Z80 format spconv will read the .Z80  file
+     and will output a .Z80 file in the version 1.45 .Z80 format. This enables
+     conversion of normal 48K Spectrum files made by Z80 version 2.01  or  3.0
+     to  the  older format so they can be loaded in a version 1.45 Z80 or 2.01
+     Z80 emulator. Of course additional information that can only be stored in
+     the  version  2.01  and 3.0 files is lost. Therefore spconv will check if
+     the .Z80 file is for a 48K Spectrum and check if the Interface-1 rom  was
+     not  paged  in.  If  the  check  fails  an error message is given and the
+     conversion is terminated - no output will be produced. Spconv  will  only
+     output  version  1.45  .Z80 files since these are compatible with old and
+     new Z80-emulator versions. If Spconv encounters a .Z80 format  file  that
+     seems  to  be  newer  than version 3.0, Spconv will attempt to convert it
+     anyway in the hope that it is upwards compatible. A warning will ge given
+     in that case.
+
+
+
+
+
+                               31th May, 1995                                1
+
+
+
+SPCONV(1)                  Unix Programmer's Manual                  SPCONV(1)
+
+
+CONVERSION NOTES
+
+     [.SP files - Used by the Spanish "SPECTRUM" and "VGASPEC" programs.]
+
+     Conversion to/from .SP files may not always work. It is not clear  to  me
+     how  IFF,  IFF2  and the interrupt mode are stored in the .SP file. Since
+     version 1.02 I have made some improvements to  this  type  of  conversion
+     however,  it  sould  work now, but I have not enough .SP samples to fully
+     test it. Note that crashing of a converted image may also  be  caused  by
+     bugs  in  the SPECTRUM emulator. Conversion to .SP will work if the image
+     is converted from a RAW image (see later).
+
+     [.Z80 files - Used by the Dutch  "Z80"  programs.  This  format  is  also
+     usable for 128K Spectrum images.]
+
+     [.SNA files - Used by the  Norwegian  "JPP"  PC-program;  the  "Spectrum"
+     program  for  the Amiga; the "XZX" X-Windows program and a lot more. This
+     is the most  supported  format  since  it  originated  from  the  Mirage-
+     Microdirver format.]
+
+     Conversion between .SNA and .Z80 and from  .Z80  to  .SNA  should  be  no
+     problem,  both formats are sufficiently described in the documentation of
+     JPP (the norwegian emulator) and Z80 (the dutch emulator).
+
+     [.PRG files are loaded by a PC-emulator from Ireland. This  emulator  can
+     not save in this format.]
+
+     Conversion to/from .PRG files should work  fine  also.  I  don't  have  a
+     description  of  that format, but I think I figured it all out by looking
+     at some samples. I only don't know where the border colour is stored. The
+     specem  emulator  (an Irish emulator) doesn't show the border, so I can't
+     find out by trail and error.
+
+     [.ACH files are  used  on  Archimeds  computers  by  an  emulator  called
+     "Speculator" or "!Speccy"]
+
+     Since  version  1.07  Conversion  should  work  without   problems.   The
+     conversion  is  patterned after a program (also called Spconv) and a BBC-
+     Basic program from John Veness (supplied to me by Mike Borcherds). I also
+     got a .ACH file snapped just after startup which was most helpfull. Since
+     the programs I got were written independently but had  all  registers  at
+     the  same place (but one got her accent registers swapped with the normal
+     registers), I think it is pritty  save  to  assume  that  the  format  is
+     correct now. The previous version of this converter got register 'I' from
+     the wrong spot, and more important, I forgot to set  the  interrupt  mode
+     when converting to .ACH file format.
+
+     It is also tested now with a fair collection of snaps. The .ACH extension
+     is  my  own invention to cope with the MS-DOS naming conventions. I named
+     them this way because the samples I had ended in ".archimedes" and use of
+     .ARC  as  extension  didn't  sound  like  a  good  idea.  I don't have an
+     archimedes computer to test it but somebody else (Adrian Jackson) did  it
+     for me. For proper conversion you need the spectrum rom because that is a
+     part of the archimedes image (don't blame me).  The  ROM  must  be  named
+     'spectrum.rom'  and  be  located  in the working directory or in the same
+     directory as spconv.exe. If no ROM is found  the  converter  will  insert
+
+
+                               31th May, 1995                                2
+
+
+
+SPCONV(1)                  Unix Programmer's Manual                  SPCONV(1)
+
+
+     NULL bytes.
+
+     [.ZX files are used by the KGB emulator on a Commodore Amiga]
+
+     Conversion to/from .ZX files should  work,  Peter  McGavin  send  me  the
+     definition  of  the format as used in the KGB emulator. I implemtented it
+     that way but I don't have an Amiga with a KGB emulator so it is untested!
+     I  previously  used  the  information about the format of the file from a
+     VAX-Basic program supplied to me by  Jason  Brown  and  most  information
+     correlated  so  I'm hopefull that it works. Please send me feetback if it
+     works so I can put it here in the documentation. Oh, before I forget, the
+     .ZX  format contains the last 132 bytes of the spectrum rom (don't ask me
+     why) so spconv will look for "spectrum.rom" in the working  directory  or
+     in the same directory as spconv.exe is located.  If absent than the first
+     132 bytes will be NULL bytes.
+
+     [RAW files are created by saving the whole ram on a real spectrum to  the
+     RS232 port of Interface-1 from basic]
+
+     Spconv can also be used to convert a raw spectrum  image  to  a  snapshot
+     file.  The  image  has  to  be  captured  with via the RS232 connetion on
+     Interface-1.  Some tools to do this are in an archive called "SPEC232". A
+     program  called  "SLOAD"  will  read from the RS232 link to a file on the
+     MSDOS-PC. At the Spectrum side the the command
+
+     SAVE *"b"CODE 16384,49152
+
+     HAS to be used. Spconv will convert the file is such  way  that  it  will
+     continue in the basic interpreter after the snapshot is loaded. so
+
+     SAVE *"b"CODE 16384,49152:PRINT Hello, World!
+
+     will after conversion to a snapshot file and loading it in  the  emulator
+     begin  with printing "Hello, World!". A description how to wire the RS232
+     cable is also in the "SPEC232" package.
+
+
+EXAMPLES
+
+     Converting a .SNA JPP file to the .Z80 Dutch emulator:   spconv  game.sna
+     game.z80 or spconv game.sna .z80
+
+
+DIAGNOSTICS
+
+     0 - OK: The program finished without problems
+
+     1 - USAGE:  The program was called incorrectly:
+
+     -    Wrong number of parameters
+
+     -    Wildcards on the command-line
+
+     -    Input and output are of the same type (not for .SP and .Z80)
+
+
+
+
+                               31th May, 1995                                3
+
+
+
+SPCONV(1)                  Unix Programmer's Manual                  SPCONV(1)
+
+
+     2 - READ_ERROR:  There was a problem while reading the input file:
+
+     -    Error while reading the input file
+
+     -    Error while fseeking the input file
+
+     3 - WRITE_ERROR: There was a problem while creating the output file:
+
+     -    Error while writing the output file
+
+     -    Error with opening/reading the spectrum.rom needed  for  the  output
+          file.
+
+     4 - FILE_ERROR:  There was a  problem  with  the  input  or  output  file
+     format:
+
+     -    Input file does not exist
+
+     -    Type of input or output file not known
+
+     -    Input file is:
+
+     +    A newer version of an existing type
+
+     +    Corrupt
+
+     +    Not in the expected format (RAW and new .SP types)
+
+     +    Not a 48K spectrum file (in .Z80 files)
+
+     -    Input file snapshot was taken while the interface-1 was paged in (in
+          .Z80  files).  The  other  file  formats  can  not  cope  with  this
+          (including the version 1.45 .Z80 files).
+
+     -    Undocumented page number in .Z80 files (file corrupt).
+
+     -    Decompression of .Z80 file failed (file corrupt).
+
+
+PORTABILITY
+
+     The program should be portable. Assumptions about endian-ness are avoided
+     and  I  ensured  clean  compilation with Turbo-C++ 1.0 (with all warnings
+     enabled).  Chris Wells used this command line of GCC on this program (and
+     gave feetback until it gave a clean compile):
+
+     gcc -ansi -pedantic -Wall -Wwrite-strings -Wshadow -Wformat
+     -Wpointer-arith -Wconversion -Wstrict-prototypes
+     -Wmissing-prototypes -o spconv spconv.c
+
+
+     I also ensured that the identifiers used in the program are uniq  in  the
+     first  8  characters.  I  don't  expect  much problems when compiling the
+     program with other compilers. The code does make assumptions  about  path
+     names.   Using  the  program on a VAX will give problems with recognizing
+     directories e.t.c. especially for finding "spectrum.rom", I leave  a  fix
+
+
+                               31th May, 1995                                4
+
+
+
+SPCONV(1)                  Unix Programmer's Manual                  SPCONV(1)
+
+
+     for this as an exercise...
+
+
+BUGS
+
+     Conversion to/from .SP files may not always work.
+
+
+THANKS TO
+
+     Thanks  for  suppling  information  and  for  creating   these   spectrum
+     emulators:
+     Arnt Gulbrandsen (author of JPP)
+     Ramco v.d. Woestijne (supplied new .SP format);
+     Gerton A. Lunter (author of Z80);
+     Pedro Gimeno (author of SPECTRUM);
+     Kevin J Phair (author of SPECEM);
+     Mike Borcherds (suppied the archimedes file format);
+     Jason Brown (suppied the initial KGB file format);
+     Peter McGavin (suppied the complete KGB file format);
+     John Veness (reverse engineerd the ACH file format);
+     Adrian Jackson (send me a near perfect .SNA to .ACH converter);
+     Chris Wells (ran the program through GCC in pedantic  mode  and  supplied
+     the UNIX man page and Makefile).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               31th May, 1995                                5
+

@@ -1,0 +1,263 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+!SPConv - RISC-OS version (1.10), based on SPConv (version 1.08)
+================================================================
+
+Purpose: To convert ZX Spectrum 'snapshot' images to and from different
+         formats.
+
+Details: A ZX Spectrum 'snapshot' is a memory dump of a Sinclair ZX Spectrum
+         computer suitable for use with a ZX Spectrum emulator (common on many
+         machines now). The RISC-OS platforms have several such emulators
+         (listed below).
+         This application allows the user to convert different formats of
+         spectrum snapshots to other versions.
+
+         For full documentation on the converter itself, the different
+         snapshot formats and the original CLI version (and its author), see
+         the documents in the directory 'Docs' inside this application.
+         (Hold down SHIFT and double-click on the application in a filer
+         window to gain access to it).
+
+         This version is a wimp version for RISC-OS that deals with a drag-
+         and-drop interface and a simple dialogue box to choose the format
+         to convert to. The original version is a command-line based version.
+         Support for interactive help on windows and icons is also provided as
+         well as a help menu option.
+
+         The main program (SPconv-FE.c) is a front end to 'ROS-SPConv.c'
+         (a modified version of 'SPConv.c').
+
+Installation:
+         To install, just drag the application from the archive onto
+         a destination filer window to copy it.
+         Using a suitable archive filing system (eg. ArcFS), !SPConv should
+         run from within an archive.
+         If there are problems de-archiving or running in archives, then
+         try de-archiving with !Spark or !SparkPlug.
+
+Usage:   1) Install the application on the icon bar by 'double-clicking' on the
+            application in a filer window.
+         2) Drag a snapshot file of a suitable filetype (see below for info on
+            filetypes) onto the icon bar application and a convert dialogue
+            window will pop-up.
+         3) Select the file format to convert to by clicking on the suitable
+            option. (If new 'filetypes' are needed for Z80 or SNA files, then
+            'uncheck' the "Old-format Z80/SNA files" box by clicking on it.
+            see the 'filetype' info below for more information on this).
+         4) Now click on the 'Convert' icon to start the conversion.
+            (Click on the 'Cancel' icon to abandon the conversion).
+         5) A 'save-as' window will pop-up allowing you to save your file
+            to a filer window in the normal RISC-OS manner.
+
+
+File Types:
+         You must 'file-type' your snapshot files under RISC-OS for them to
+         be accepted by !SPConv.
+         Use the filer menu under the 'file' submenu and 'set type' and
+         specify one of the filetypes below.
+         When using !MZX (at least up to version 1.10), set the file types
+         for Z80 to Z80old (or CEE) and for SNA to SNAold (or CEF). 
+         
+         The filetypes are the RISC-OS equivalent to the file extensions
+         used on versions of 'spconv' on other machines.
+         I have used the following file types for the moment, based on the
+         types used in the Spectrum emulators for RISC-OS machines...
+
+	 Filetype      :  Hex equivalent
+	 ---------------------------------------------------
+         Z80 & Z80old  :  BA0 & CEE       (Z80 snapshot)
+         SNA & SNAold  :  BA1 & CEF       (SNA snapshot)
+         SP            :  225             (SP snapshot)
+         PRG           :  226             (PRG snapshot)
+         ZX            :  227             (ZX/KGB snapshot)
+         SpecProg      :  702             (ACH snapshot)
+         RAWsnap       :  701             (RAW file)
+         <unknown/data>:  FFD             (Unknown type)
+         
+         Note that the filetypes BA0 and BA1 are official Acorn filetypes,
+         but that current Acorn emulators (as of June 1995) do not use them.
+         For this reason, there is an option provided to choose between new
+         and old style filetypes for Z80 and SNA files.
+         The current default is to use the old formats which are compatible
+         with current versions of emulators such as !MZX.
+         
+	 The output filetype is fairly irrelevent when moving the files to
+	 another machine, though the can help you identify what they are
+	 before copying, for example, onto a DOS disc.
+	
+	 Note that these filetypes do not distinguish different versions
+	 of 'snapshots', such as different versions of the Z80 snapshot.
+	 The converter *should* try to deal with them.
+
+         If you don't know what type the file should be then it may be
+         a RAW file. Try either RAWsnap (701) filetype or just plain
+         Data (FFD).
+         If it is a RAW file, then the converter will attempt to convert
+         these if possible.
+         If not, try each of the above types (SNA & Z80 being the most common).
+         
+
+
+!Scrap:  RISC-OS must have seen the application !Scrap for this to work, and
+         must have read/write access to !Scrap (and sufficient space -
+         probably 48k to 64k aprox.) for it to work. (Good reason to get a
+         hard disc :-)
+
+Notice:
+         I'm no expert on the snapshot converter itself, just the front-end,
+         so you may have more luck with the original author if any conversion
+         problems arise. Hopefully there shouldn't be any errors introduced
+         into it by this front-end.
+         See the documentation inside 'Docs' for details about the converter.
+
+         This application has not been tested on pre-A5000 machines or
+         pre-Risc-OS 3.10 systems. (It also requires SharedCLibrary 3.50
+         or higher - I think).
+
+The ZX Spectrum ROM:
+         A copy of the 16k ROM image from the ZX spectrum is required for some
+         conversions. It is provided in the 'Resources' directory inside this
+         application on the basis that it has been released into the Public
+         Domain. The ROM is (was?) copyrighted to Sinclair Research.
+
+        =================================================================
+
+Inside the original distribution archives...
+
+SPConv.arc contains:
+  !SPConv
+     !Boot, !Run, !Sprites,Sprites, Messages, } - The application files.
+     !RunImage etc.                           }
+     Resources.RomImage   - The rom image (spectrum.rom - see documentation).
+                            for certain conversions.
+     Docs                 - Documentation of SPConv 1.08
+
+spcnvsrc.arc contains:
+  ReadMe                  - Details about merging source with main application.
+  !SPConv
+     c, h, o, Makefile    - All to do with the source for this version.
+     CliSource            - Original unix & PC source for SPConv 1.08
+     OldSprites           - Old Sprites
+
+The source directory application can be merged into the main application by
+simply dragging the source !SPconv icon onto the main one (once unarchived).
+
+        =================================================================
+
+Author:  RISC-OS conversion: Tim Moore (c) 1995
+         Original version: Henk de Groot (c)
+           (Contact: Henk de Groot, hegr@ensae.ericsson.se)
+
+Acknowledgements:
+         !MZX and !Speculator authors for some of the filetypes and the
+         Sprites for the filetypes (now replaced by newer ones).
+         Note: The 701 and 702 filetypes are taken from !Speculator
+               and I've assumed that 701 fits RAW files.
+               The CEE and CEF filetypes are from !MZX.
+         
+         Mike Borcherds for supplying the Acorn filetypes for Z80/SNA.
+         Richard G. Hallas for some advice, new sprites and template
+            improvements.
+
+Some Archimedes ZX Spectrum Emulators:
+         !MZX (version 1.10 at this date) by Graham Willmott
+            Last known contact:
+               Graham Willmott   (se2044@bristol.ac.uk)   22 Apr 1994
+
+         !Speculator, author unknown, availability (officially) unknown.
+            Apparently copies available should not be around.
+
+
+- ----------------------------------------------------------------
+     This application is Public Domain.
+     Distribution is only allowed if the application is
+     kept to it's orignal structure, or any alterations
+     are described and acknowledged and I'm notified
+     of such changes.
+
+     Any source codes and binaries included are copyrighted
+     to the author(s) of them.
+
+     Tim Moore © 1995
+
+- ----------------------------------------------------------------
+If you wish to contact me then I can be mailed at ...
+
+Internet mail (University of Portsmouth):
+     sis1514@sis.port.ac.uk
+
+(Until July-ish 1995)
+
+I finish before then, so mail may remain unanswered for
+a while.
+
+After that, I don't know what's happening, so this may be
+the other possibility until I can get another account (and
+maybe a modem etc...) :-
+
+Mr. T.Moore
+30 Meadow Rise
+Dawlish
+Devon
+EX7 9AZ
+
+
+(Future stuff from me can be verified with PGP).
+- ----------------------------------------------------------------
+
+History:
+     v0.01 - Development version, no front-end. Changed source a little bit
+             to work under RISC-OS and to not use UNIX libraries (which caused
+             problems when combined with RISC_OSLib).
+             Also made the source a header/source set and changed the main
+             parameters (no 'main' anymore) so that it could be called
+             suitably from a 'front-end'. The source doesn't deal with
+             determining file types anymore.
+     v0.02 - Development version, with front-end. Did templates, wimp shell
+             and all those sort of things. Deal with 'drag-and-drop' loading
+             and saving, file type identification, calling the conversion
+             routines and saving from !Scrap. Doesn't support RAM loading/
+             saving events.
+     v1.00 - Release version. Added !Help and tidied up etc.
+     v1.01 - Alteration to change filetypes for SNA and Z80.
+     v1.02 - Changes to template to use outline fonts and align correctly
+             (I hope).
+     v1.03a- Outline fonts cause problems with RiscPC (I thought they might)
+             so, they're back to as before. Better this way, as you can choose
+             the font to use on the basis of the system font (similar patches
+             exist for pre-RiscPC machines - see 'FinalLook' by Matthew Godbolt
+             especially).
+             Option to save old sprite filetypes added and new sprites addded.
+     v1.04 - Tidy up of templates and fonts. Thanks to Richard G. Hallas for
+             this.
+     v1.04a- Woops, help text didn't work. Now corrected.
+     v1.10 - Updated for spconv 1.08 & a few small changes.
+             It should all work OK (I Hope).
+
+
+Disclaimer:
+     Any problems and bugs with this program that may lead to your problems
+     are not my fault, and are the fault of instructions (or lack of) that
+     people give for wimp programming :-)
+
+     Please tell me what the bugs are, if possible, though or any conflicts
+     with filetypes or anything else.
+
+
+PGP:
+     You can check my signatures using a trusted public key of mine.
+     A copy of my public key block is in the file 'pubkey/asc', but you need
+     an independent trusted key to be sure.
+     (The signature for the !RunImage executable is RImage/sig. Check with
+     the command 'pgp RImage/sig !RunImage' or using a front-end application).
+
+-----BEGIN PGP SIGNATURE-----
+Version: 2.3a
+
+iQCVAgUBL97pPNZm1AuttC5dAQHGQgP/VW2lhjXb5d+/FOD3Mq9T7YZ3WLTm03A5
+cfaMPRMn6omelZiEm+cBtE/LHaWKaV8EzIeKv+q8KTgquln5VKqRhZLi/vkHcm3D
+kpYJ2pXJu4m6Q9ApzQIV0dQGzP9ThShQHXYVr+Z6bh/IDEiFPI4/XM30DTMuVal/
+RihtOjd9uV0=
+=r2tu
+-----END PGP SIGNATURE-----
